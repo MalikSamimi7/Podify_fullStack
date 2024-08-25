@@ -28,6 +28,7 @@ const user = require("../models/user");
 const { verify } = require("jsonwebtoken");
 const { JWT_SECRET } = require("../utils/variables");
 const fileParser = require("../middleware/fileParser");
+const sendToken = require("../middleware/sendToken");
 
 const router = express.Router();
 
@@ -45,7 +46,9 @@ router.get(
 );
 router.post(
   "/reset-password",
+
   validater(resetPasswordVSchema),
+
   verifyMailedToken(),
   resetPassword
 );

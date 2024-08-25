@@ -51,7 +51,7 @@ const verifyUserByMailVShema = yup.object().shape({
 });
 
 const resetPasswordVSchema = yup.object().shape({
-  token: yup.string().min(6, "invalid token").required("invalid token"),
+  token: yup.string().min(6, "invalid token").required("token required!"),
   userId: yup
     .string()
     .transform(function (value) {

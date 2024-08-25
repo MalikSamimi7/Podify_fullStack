@@ -21,7 +21,7 @@ const create = async (req, res, next) => {
 
   const token = generateToken();
 
-  sendVerificationMail(token, {
+  await sendVerificationMail(token, {
     userId: newUser._id,
     name: newUser.name,
     email: newUser.email,
@@ -29,7 +29,7 @@ const create = async (req, res, next) => {
   // verificationToken.compareToken()
   console.log(token);
   try {
-    newUser.save();
+    await newUser.save();
 
     res
       .status(201)
@@ -49,6 +49,7 @@ const verifyEmail = async (req, res) => {
 
   const match = verificationToken.compareToken(token);
   if (!match) return res.status(403).json({ error: "invalid token" });
+  if (!user) return res.status(403).json({ error: "invalid user" });
 
   await User.findByIdAndUpdate(userId, { verified: true });
   await EmailVerificationToken.findByIdAndDelete(verificationToken._id);
@@ -60,7 +61,6 @@ const reverifyEmail = async (req, res) => {
   const { userId } = req.body;
 
   const user = await User.findById(userId);
-  if (!user) return res.status(403).json({ error: "invalid user" });
   await EmailVerificationToken.findOneAndDelete({ owner: userId });
 
   const token = generateToken();
@@ -100,6 +100,7 @@ const verifyUserByMail = async (req, res) => {
 };
 
 const resetPassword = async (req, res) => {
+  console.log("reset route");
   const { userId, password } = req.body;
 
   const user = await User.findByIdAndUpdate(userId, { password });

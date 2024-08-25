@@ -8,7 +8,7 @@ const verifyMailedToken = () => {
       owner: userId,
     });
     if (!verificationToken) {
-      return res.status(403).json({ error: "invalid token" });
+      return res.status(403).json({ error: "token not found" });
     }
     const match = await verificationToken.compareToken(token);
 

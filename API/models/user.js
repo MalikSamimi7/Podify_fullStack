@@ -57,7 +57,19 @@ userSchema.pre("save", async function (next) {
   }
   next();
 });
+userSchema.pre("findOneAndUpdate", async function (next) {
+  const update = this.getUpdate(); // {password: "..."}
+  if (update.password) {
+    const passwordHash = await hash(update.password, 10);
+    this.setUpdate({
+      $set: {
+        password: passwordHash,
+      },
+    });
+  }
 
+  next();
+});
 userSchema.methods.comparePassword = async function (password) {
   const result = await compare(password, this.password);
   return result;
