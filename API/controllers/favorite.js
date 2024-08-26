@@ -46,4 +46,33 @@ const favoriteToggle = async (req, res, next) => {
   res.send({ status: status });
 };
 
-module.exports = { favoriteToggle };
+const getFavorites = async (req, res) => {
+  const userId = req.user.userId;
+  const favorites = await Favorite.findOne({ owner: userId }).populate({
+    path: "items",
+    populate: {
+      path: "owner",
+    },
+  });
+
+  //   if (favorites[0].items.length < 1)
+  //     return res.status(422).send({ error: "favorite list is empty!" });
+
+  res.send({ favorites });
+};
+
+const isFav = async (req, res) => {
+  const userId = req.user.userId;
+  const audioId = req.query.audioId;
+
+  if (!isValidObjectId(audioId))
+    return res.status(422).send({ error: "invalid audio id" });
+
+  const favorite = await Favorite.findOne({ owner: userId, items: audioId });
+
+  if (!favorite) return res.status(422).send({ favorite: false });
+
+  return res.send({ favorite: true });
+};
+
+module.exports = { favoriteToggle, getFavorites, isFav };
