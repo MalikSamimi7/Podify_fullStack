@@ -19,7 +19,7 @@ const isAuth = async (req, res, next) => {
 
     const user = await User.findById(id);
     if (!user) return res.status(403).json({ error: "unauthorized request" });
-    console.log(user);
+
     req.user = formatProfile(user);
   } catch (error) {
     if (error instanceof JsonWebTokenError)

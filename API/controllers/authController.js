@@ -100,7 +100,6 @@ const verifyUserByMail = async (req, res) => {
 };
 
 const resetPassword = async (req, res) => {
-  console.log("reset route");
   const { userId, password } = req.body;
 
   const user = await User.findByIdAndUpdate(userId, { password });
