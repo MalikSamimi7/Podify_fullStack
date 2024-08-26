@@ -136,7 +136,7 @@ const cloudinary = require("../cloud/index");
 const updateAccount = async (req, res) => {
   let { name } = req.body;
 
-  name = name[0];
+  //name = name[0];
 
   const avatar = req.files?.avatar;
   //console.log(avatar[0].filepath);
@@ -145,9 +145,9 @@ const updateAccount = async (req, res) => {
   if (!user) throw new Error("user not found");
 
   if (typeof name !== "string")
-    return res.status(422).json({ error: "invalid name" });
+    return res.status(422).json({ error: "invalid name type" });
   if (name.trim().length < 3)
-    return res.status(422).json({ error: "invalid name" });
+    return res.status(422).json({ error: "invalid name lenght" });
 
   user.name = name;
 

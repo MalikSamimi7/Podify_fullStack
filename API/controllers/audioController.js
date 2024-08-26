@@ -1,5 +1,6 @@
 const Audio = require("../models/audio");
 const cloudinary = require("../cloud/index");
+const User = require("../models/user");
 
 const createAudio = async (req, res) => {
   const { title, about, category } = req.body;
@@ -52,4 +53,27 @@ const createAudio = async (req, res) => {
   });
 };
 
-module.exports = { createAudio };
+const updateAudio = async (req, res) => {
+  const { title, about, category } = req.body;
+  const { id } = req.params;
+  const { userId } = req.user;
+
+  const user = await User.findById(userId);
+
+  if (!user) return res.status(422).send({ error: "owner not found" });
+
+  const audio = await Audio.findOne({ owner: userId });
+  if (!audio) return res.status(422).send({ error: "audio not found" });
+
+  audio.title = title;
+  audio.about = about;
+  audio.category = category;
+
+  await audio.save();
+
+  res.status(201).send({ audio: audio });
+
+  //console.log(req.user);
+};
+
+module.exports = { createAudio, updateAudio };

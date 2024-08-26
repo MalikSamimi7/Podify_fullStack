@@ -94,6 +94,14 @@ const audioValidationSchema = yup.object().shape({
     .required("category is missing"),
 });
 
+const audioUpdateValidationSchema = yup
+  .object()
+  .shape({
+    title: yup.string(),
+    about: yup.string(),
+    category: yup.string().oneOf(categories, "invalid category"),
+  });
+
 module.exports = {
   userSchemaValidation,
   emailVerificationSchema,
@@ -102,4 +110,5 @@ module.exports = {
   resetPasswordVSchema,
   signInValidatinSchema,
   audioValidationSchema,
+  audioUpdateValidationSchema,
 };
