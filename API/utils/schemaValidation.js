@@ -94,13 +94,37 @@ const audioValidationSchema = yup.object().shape({
     .required("category is missing"),
 });
 
-const audioUpdateValidationSchema = yup
-  .object()
-  .shape({
-    title: yup.string(),
-    about: yup.string(),
-    category: yup.string().oneOf(categories, "invalid category"),
-  });
+const audioUpdateValidationSchema = yup.object().shape({
+  title: yup.string(),
+  about: yup.string(),
+  category: yup.string().oneOf(categories, "invalid category"),
+});
+
+const playlistValidationSchema = yup.object().shape({
+  title: yup.string().required("title is missing"),
+  resId: yup.string().transform(function (value) {
+    return this.isType(value) && isValidObjectId(value) ? value : "";
+  }),
+  visibility: yup
+    .string()
+    .oneOf(["public", "private"], "visibility must be public or private")
+    .required("visibility missing!"),
+});
+
+const updatePlaylistValidationSchema = yup.object().shape({
+  title: yup.string().required("title is missing"),
+  //validating audio id
+  item: yup.string().transform(function (value) {
+    return this.isType(value) && isValidObjectId(value) ? value : "";
+  }),
+  //validating playlist id
+  id: yup.string().transform(function (value) {
+    return this.isType(value) && isValidObjectId(value) ? value : "";
+  }),
+  visibility: yup
+    .string()
+    .oneOf(["public", "private"], "visibility must be public or private"),
+});
 
 module.exports = {
   userSchemaValidation,
@@ -111,4 +135,6 @@ module.exports = {
   signInValidatinSchema,
   audioValidationSchema,
   audioUpdateValidationSchema,
+  playlistValidationSchema,
+  updatePlaylistValidationSchema,
 };

@@ -5,6 +5,7 @@ require("./db");
 const auth = require("./routes/auth");
 const audio = require("./routes/audio");
 const favorite = require("./routes/favorite");
+const playlist = require("./routes/playlist");
 const app = express();
 
 app.use(express.json());
@@ -13,6 +14,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use("/auth", auth);
 app.use("/audio", audio);
 app.use("/favorite", favorite);
+app.use("/playlist", playlist);
 app.use("/", (req, res) => {
   res.send("main route hitted");
 });
