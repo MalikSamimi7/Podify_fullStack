@@ -6,7 +6,13 @@ const {
   playlistValidationSchema,
   updatePlaylistValidationSchema,
 } = require("../utils/schemaValidation");
-const { create, updatePlaylist } = require("../controllers/playlistController");
+const {
+  create,
+  updatePlaylist,
+  removePlaylist,
+  getByProfile,
+  getAudios,
+} = require("../controllers/playlistController");
 
 const router = Router();
 
@@ -24,5 +30,10 @@ router.patch(
   validater(updatePlaylistValidationSchema),
   updatePlaylist
 );
+
+router.delete("/", isAuth, removePlaylist);
+
+router.get("/get-byProfile", isAuth, getByProfile);
+router.get("/:playlistId", isAuth, getAudios);
 
 module.exports = router;
