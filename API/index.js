@@ -7,6 +7,8 @@ const audio = require("./routes/audio");
 const favorite = require("./routes/favorite");
 const playlist = require("./routes/playlist");
 const profile = require("./routes/profile");
+const history = require("./routes/history");
+
 const app = express();
 
 app.use(express.json());
@@ -17,6 +19,7 @@ app.use("/audio", audio);
 app.use("/favorite", favorite);
 app.use("/playlist", playlist);
 app.use("/profile", profile);
+app.use("/history", history);
 app.use("/", (req, res) => {
   res.send("main route hitted");
 });

@@ -126,6 +126,24 @@ const updatePlaylistValidationSchema = yup.object().shape({
     .oneOf(["public", "private"], "visibility must be public or private"),
 });
 
+const updateHistoryValidtionSchema = yup.object().shape({
+  audio: yup
+    .string()
+    .transform(function (value) {
+      return this.isType(value) && isValidObjectId(value) ? value : "";
+    })
+    .required("audio id is missing!"),
+  progress: yup.string().required("history progress is required!"),
+  date: yup
+    .string()
+    .transform(function (value) {
+      const date = new Date(value);
+      if (date instanceof Date) return value;
+      return "";
+    })
+    .required("valid date required!"),
+});
+
 module.exports = {
   userSchemaValidation,
   emailVerificationSchema,
@@ -137,4 +155,5 @@ module.exports = {
   audioUpdateValidationSchema,
   playlistValidationSchema,
   updatePlaylistValidationSchema,
+  updateHistoryValidtionSchema,
 };
