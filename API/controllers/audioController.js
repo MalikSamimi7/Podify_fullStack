@@ -72,8 +72,27 @@ const updateAudio = async (req, res) => {
   await audio.save();
 
   res.status(201).send({ audio: audio });
-
-  //console.log(req.user);
 };
 
-module.exports = { createAudio, updateAudio };
+const getLatestUploads = async (req, res) => {
+  const data = await Audio.find()
+    .sort("-createdAt")
+    .limit(10)
+    .populate("owner");
+
+  const audios = data.map((item) => {
+    return {
+      id: item._id,
+      title: item.title,
+      about: item.about,
+      category: item.category,
+      file: item.file.url,
+      poster: item.poster?.url,
+      owner: { name: item.owner?.name, id: item.owner?._id },
+    };
+  });
+
+  res.send(audios);
+};
+
+module.exports = { createAudio, updateAudio, getLatestUploads };

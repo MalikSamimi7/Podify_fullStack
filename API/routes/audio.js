@@ -6,7 +6,11 @@ const {
   audioValidationSchema,
   audioUpdateValidationSchema,
 } = require("../utils/schemaValidation");
-const { createAudio, updateAudio } = require("../controllers/audioController");
+const {
+  createAudio,
+  updateAudio,
+  getLatestUploads,
+} = require("../controllers/audioController");
 const isVerified = require("../middleware/isVerified");
 
 const router = Router();
@@ -28,5 +32,6 @@ router.patch(
   validater(audioUpdateValidationSchema),
   updateAudio
 );
+router.get("/latestUploads", getLatestUploads);
 
 module.exports = router;
