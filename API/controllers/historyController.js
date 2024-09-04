@@ -94,7 +94,7 @@ const deleteHistory = async (req, res) => {
   const histories = req.query.histories;
 
   const ids = JSON.parse(histories);
-  console.log(ids);
+
   await History.findOneAndUpdate(
     {
       owner: userId,
@@ -107,4 +107,59 @@ const deleteHistory = async (req, res) => {
   res.json({ success: true });
 };
 
-module.exports = { updateHistory, deleteHistory };
+const recentlyPlayedAudios = async (req, res) => {
+  const { userId } = req.user;
+  const data = await History.aggregate([
+    { $match: { owner: userId } },
+    { $project: { myHistory: { $slice: ["$all", 10] } } },
+    {
+      $project: {
+        histories: {
+          $sortArray: {
+            input: "$myHistory",
+            sortBy: { date: -1 },
+          },
+        },
+      },
+    },
+    { $unwind: { path: "$histories", includeArrayIndex: "index" } },
+    {
+      $lookup: {
+        from: "audios",
+        localField: "histories.audio",
+        foreignField: "_id",
+        as: "audioInfo",
+      },
+    },
+    {
+      $unwind: "$audioInfo",
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "audioInfo.owner",
+        foreignField: "_id",
+        as: "owner",
+      },
+    },
+    { $unwind: "$owner" },
+    {
+      $project: {
+        _id: 0,
+        id: "$audioInfo._id",
+        title: "$audioInfo.title",
+        about: "$audioInfo.about",
+        category: "$audioInfo.category",
+        file: "$audioInfo.file.url",
+        poster: "$audioInfo.poster.url",
+        owner: { name: "$owner.name", id: "$owner._id" },
+        date: "$histories.date",
+        progress: "$histoires.progress",
+      },
+    },
+  ]);
+
+  res.send(data);
+};
+
+module.exports = { updateHistory, deleteHistory, recentlyPlayedAudios };
