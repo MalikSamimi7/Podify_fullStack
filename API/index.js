@@ -8,6 +8,7 @@ const favorite = require("./routes/favorite");
 const playlist = require("./routes/playlist");
 const profile = require("./routes/profile");
 const history = require("./routes/history");
+require("./utils/taskScheduler");
 
 const app = express();
 

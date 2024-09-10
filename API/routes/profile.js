@@ -7,7 +7,10 @@ const {
   getPublicUploads,
   getPublicProfile,
   getPublicPlaylist,
+  getRecommandedAudios,
 } = require("../controllers/profileController");
+const { checkout } = require("./auth");
+const checkAuth = require("../middleware/checkAuth");
 
 const router = Router();
 
@@ -16,4 +19,6 @@ router.get("/uploads", isAuth, getUploads);
 router.get("/uploads/:profileId", getPublicUploads);
 router.get("/info/:profileId", getPublicProfile);
 router.get("/playlist/:profileId", getPublicPlaylist);
+
+router.get("/recommanded", checkAuth, getRecommandedAudios);
 module.exports = router;

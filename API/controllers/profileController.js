@@ -2,6 +2,8 @@ const { isValidObjectId } = require("mongoose");
 const User = require("../models/user");
 const Audio = require("../models/audio");
 const Playlist = require("../models/playlist");
+const History = require("../models/history");
+const moment = require("moment");
 
 const updateFollower = async (req, res) => {
   const { profileId } = req.params;
@@ -148,10 +150,85 @@ const getPublicPlaylist = async (req, res) => {
   });
 };
 
+const getRecommandedAudios = async (req, res) => {
+  const userId = req.user?.userId;
+
+  let matchOptions = { $match: { _id: { $exists: true } } };
+  if (userId) {
+    const history = await History.aggregate([
+      { $match: { owner: userId } },
+      { $unwind: "$all" },
+      {
+        $match: {
+          "all.date": {
+            $gte: moment().subtract(30, "days").toDate(),
+          },
+        },
+      },
+      {
+        $group: { _id: "$all.audio" },
+      },
+      {
+        $lookup: {
+          from: "audios",
+          localField: "_id",
+          foreignField: "_id",
+          as: "audioInfo",
+        },
+      },
+      { $unwind: "$audioInfo" },
+      { $group: { _id: null, category: { $addToSet: "$audioInfo.category" } } },
+    ]);
+    const categories = history[0].category;
+    if (categories.length) {
+      matchOptions = {
+        $match: { category: { $in: categories } },
+      };
+    }
+  }
+
+  const audios = await Audio.aggregate([
+    matchOptions,
+    {
+      $sort: { "likes.count": -1 },
+    },
+    { $limit: 10 },
+    {
+      $lookup: {
+        from: "users",
+        localField: "owner",
+        foreignField: "_id",
+        as: "owner",
+      },
+    },
+    {
+      $unwind: "$owner",
+    },
+    {
+      $project: {
+        _id: 0,
+        id: "$_id",
+        title: "$title",
+        about: "$abut",
+        category: "$category",
+        file: "$file.url",
+        poster: "$poster.url",
+        owner: {
+          name: "$owner.name",
+          id: "$owner._id",
+        },
+      },
+    },
+  ]);
+
+  res.send(audios);
+};
+
 module.exports = {
   updateFollower,
   getUploads,
   getPublicUploads,
   getPublicProfile,
   getPublicPlaylist,
+  getRecommandedAudios,
 };

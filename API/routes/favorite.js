@@ -5,7 +5,7 @@ const {
   favoriteToggle,
   getFavorites,
   isFav,
-} = require("../controllers/favorite");
+} = require("../controllers/favoriteController");
 
 const router = Router();
 
