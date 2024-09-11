@@ -1,4 +1,5 @@
 const express = require("express");
+//require("async-error");
 require("./db");
 // import express from "express";
 // import "./db/index.js";
@@ -8,6 +9,7 @@ const favorite = require("./routes/favorite");
 const playlist = require("./routes/playlist");
 const profile = require("./routes/profile");
 const history = require("./routes/history");
+const errorHandler = require("./middleware/errorHandler");
 require("./utils/taskScheduler");
 
 const app = express();
@@ -24,6 +26,8 @@ app.use("/history", history);
 app.use("/", (req, res) => {
   res.send("main route hitted");
 });
+
+//app.use(errorHandler);
 
 app.listen(3000, () => {
   console.log("listeng");

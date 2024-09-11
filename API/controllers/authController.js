@@ -13,6 +13,11 @@ const jwt = require("jsonwebtoken");
 const create = async (req, res, next) => {
   const { name, password, email } = req.body;
   console.log(name);
+
+  const oldUser = await User.findOne({ email });
+
+  if (oldUser) return res.status(422).send({ error: "Email already used!" });
+
   const newUser = new User({
     name: name,
     email: email,
@@ -62,6 +67,9 @@ const reverifyEmail = async (req, res) => {
 
   const user = await User.findById(userId);
   await EmailVerificationToken.findOneAndDelete({ owner: userId });
+
+  if (user.verified)
+    return res.status(422).send({ error: "your account is already verified!" });
 
   const token = generateToken();
 

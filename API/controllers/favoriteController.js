@@ -48,17 +48,74 @@ const favoriteToggle = async (req, res, next) => {
 
 const getFavorites = async (req, res) => {
   const userId = req.user.userId;
-  const favorites = await Favorite.findOne({ owner: userId }).populate({
-    path: "items",
-    populate: {
-      path: "owner",
+
+  const { limit = "20", pageNo = "0" } = req.query;
+
+  const favoriteItems = await Favorite.aggregate([
+    {
+      $match: { owner: userId },
     },
-  });
+    {
+      $project: {
+        audioIds: {
+          $slice: [
+            "$items",
+            parseInt(limit) * parseInt(pageNo),
+            parseInt(limit),
+          ],
+        },
+      },
+    },
+    {
+      $unwind: "$audioIds",
+    },
+    {
+      $lookup: {
+        from: "audios",
+        localField: "audioIds",
+        foreignField: "_id",
+        as: "audioInfo",
+      },
+    },
+    {
+      $unwind: "$audioInfo",
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "audioInfo.owner",
+        foreignField: "_id",
+        as: "ownerInfo",
+      },
+    },
+    {
+      $unwind: "$ownerInfo",
+    },
+    {
+      $project: {
+        _id: 0,
+        id: "$audioInfo._id",
+        title: "$audioInfo.title",
+        about: "$audioInfo.about",
+        category: "$audioInfo.category",
+        file: "$audioInfo.file.url",
+        poster: "$audioInfo.poster.url",
+        owner: { name: "$ownerInfo.name", id: "$ownerInfo._id" },
+      },
+    },
+  ]);
+
+  // const favorites = await Favorite.findOne({ owner: userId }).populate({
+  //   path: "items",
+  //   populate: {
+  //     path: "owner",
+  //   },
+  // });
 
   //   if (favorites[0].items.length < 1)
   //     return res.status(422).send({ error: "favorite list is empty!" });
 
-  res.send({ favorites });
+  res.send({ audios: favoriteItems });
 };
 
 const isFav = async (req, res) => {
