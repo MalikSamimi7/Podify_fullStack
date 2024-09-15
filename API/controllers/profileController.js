@@ -508,6 +508,7 @@ const getIsFollowing = async (req, res) => {
     _id: profileId,
     followings: req.user.userId,
   });
+
   if (user) return res.send({ follower: true });
 
   res.send({ follower: false });

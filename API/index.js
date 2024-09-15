@@ -1,5 +1,5 @@
 const express = require("express");
-//require("async-error");
+require("express-async-errors");
 require("./db");
 // import express from "express";
 // import "./db/index.js";
@@ -27,7 +27,7 @@ app.use("/", (req, res) => {
   res.send("main route hitted");
 });
 
-//app.use(errorHandler);
+app.use(errorHandler);
 
 app.listen(3000, () => {
   console.log("listeng");
